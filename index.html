@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gradient Descent Visualizer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      text-align: center;
+    }
+    #graph {
+      margin: 0 auto;
+      width: 700px;
+      height: 600px;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    label {
+      margin: 0 10px;
+    }
+    input[type="number"] {
+      width: 60px;
+    }
+    button {
+      margin-left: 10px;
+    }
+  </style>
+  <!-- Include Plotly.js library -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+
+  <form id="inputForm">
+    <label>
+      x:
+      <input type="number" id="xInput" value="1" step="0.1">
+    </label>
+    <label>
+      y:
+      <input type="number" id="yInput" value="1" step="0.1">
+    </label>
+    <button type="submit">Update Point</button>
+  </form>
+
+  <div id="graph"></div>
+
+  <p id="gradientInfo"></p>
+
+  <script>
+    // Function to compute the gradient
+    function computeGradient(x, y) {
+      return { gradX: 2 * x, gradY: 2 * y };
+    }
+
+    // Function to update the graph
+    function updateGraph(x, y) {
+      const { gradX, gradY } = computeGradient(x, y);
+
+      // Generate data for the surface plot
+      const gridSize = 50;
+      const xRange = numeric.linspace(-5, 5, gridSize);
+      const yRange = numeric.linspace(-5, 5, gridSize);
+      const zData = [];
+      for (let i = 0; i < gridSize; i++) {
+        const row = [];
+        for (let j = 0; j < gridSize; j++) {
+          const xi = xRange[j];
+          const yi = yRange[i];
+          row.push(xi * xi + yi * yi);
+        }
+        zData.push(row);
+      }
+
+      // Surface plot data
+      const surface = {
+        z: zData,
+        x: xRange,
+        y: yRange,
+        type: 'surface',
+        colorscale: 'Viridis',
+        opacity: 0.8,
+        showscale: false,
+        name: 'Surface'
+      };
+
+      // Point on the surface
+      const point = {
+        x: [x],
+        y: [y],
+        z: [x * x + y * y],
+        mode: 'markers',
+        type: 'scatter3d',
+        name: 'Point',
+        marker: { color: 'blue', size: 5 }
+      };
+
+      // Gradient vector at the point
+      const gradMagnitude = Math.sqrt(gradX * gradX + gradY * gradY);
+      const gradUnitX = gradX / gradMagnitude;
+      const gradUnitY = gradY / gradMagnitude;
+
+      // Scale the gradient vector for visualization
+      const scale = 0.5;
+      const gradEndX = x + gradUnitX * scale;
+      const gradEndY = y + gradUnitY * scale;
+      const gradEndZ = (gradEndX * gradEndX) + (gradEndY * gradEndY);
+
+      // Negative gradient vector
+      const negGradEndX = x - gradUnitX * scale;
+      const negGradEndY = y - gradUnitY * scale;
+      const negGradEndZ = (negGradEndX * negGradEndX) + (negGradEndY * negGradEndY);
+
+      // Gradient vector data
+      const gradVector = {
+        x: [x, gradEndX],
+        y: [y, gradEndY],
+        z: [x * x + y * y, gradEndZ],
+        mode: 'lines',
+        type: 'scatter3d',
+        name: '∇f',
+        line: { color: 'red', width: 5 }
+      };
+
+      // Negative gradient vector data
+      const negGradVector = {
+        x: [x, negGradEndX],
+        y: [y, negGradEndY],
+        z: [x * x + y * y, negGradEndZ],
+        mode: 'lines',
+        type: 'scatter3d',
+        name: '-∇f',
+        line: { color: 'green', width: 5 }
+      };
+
+      const data = [surface, point, gradVector, negGradVector];
+
+      const layout = {
+        scene: {
+          xaxis: { title: 'x', range: [-5, 5] },
+          yaxis: { title: 'y', range: [-5, 5] },
+          zaxis: { title: 'z', range: [0, 50] },
+          camera: { eye: { x: -1.5, y: -1.5, z: 1.5 } }
+        },
+        width: 700,
+        height: 600,
+        margin: { l: 0, r: 0, b: 0, t: 0 },
+        showlegend: true,
+      };
+
+      const config = {
+        displayModeBar: false  // Hide the Plotly mode bar
+      };
+
+      Plotly.newPlot('graph', data, layout, config);
+
+      // Update gradient information
+      document.getElementById('gradientInfo').innerText =
+        `∇f = (${gradX.toFixed(2)}, ${gradY.toFixed(2)}),  ` +
+        `-∇f = (${(-gradX).toFixed(2)}, ${(-gradY).toFixed(2)})`;
+    }
+
+    // Include numeric.js for linspace function
+    (function() {
+      // Numeric.js linspace function implementation
+      window.numeric = window.numeric || {};
+      window.numeric.linspace = function(a,b,n) {
+        n = n || Math.max(Math.round(b - a) + 1, 1);
+        if (n < 2) { return n === 1 ? [a] : []; }
+        var i, ret = Array(n);
+        n--;
+        for (i = n; i >= 0; i--) { ret[i] = (i * b + (n - i) * a) / n; }
+        return ret;
+      };
+    })();
+
+    // Initial plot
+    updateGraph(1, 1);
+
+    // Handle form submission
+    document.getElementById('inputForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const x = parseFloat(document.getElementById('xInput').value);
+      const y = parseFloat(document.getElementById('yInput').value);
+      updateGraph(x, y);
+    });
+  </script>
+
+</body>
+</html>
