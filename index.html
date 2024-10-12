@@ -25,22 +25,19 @@
       padding: 20px;
       border-radius: 8px;
       box-sizing: border-box;
-      height: calc(100% - 80px); /* Adjusted based on increased container padding */
-      width: 60%;
+      height: calc(100% - 100px); /* Adjusted to fit within container */
+      width: 100%;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      float: left; /* Position plot-container on the left */
     }
 
     #plot {
       width: 100%;
-      height: calc(100% - 80px); /* Adjust height based on #info and padding */
+      height: calc(100% - 80px); /* Adjust height to leave space for #info */
     }
 
     #info {
       margin-top: 20px;
-      float: left;
-      width: 35%; /* Adjust width to fit next to the plot */
-      margin-left: 5%;
+      text-align: center;
     }
 
     #info p {
@@ -68,13 +65,6 @@
     #inputForm button {
       margin-left: 10px;
     }
-
-    /* Clear floats */
-    #container::after {
-      content: "";
-      clear: both;
-      display: table;
-    }
   </style>
   <!-- Include Plotly.js library -->
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -98,11 +88,9 @@
     <!-- Plot Container -->
     <div id="plot-container">
       <div id="plot"></div>
-    </div>
-
-    <!-- Info Section -->
-    <div id="info">
-      <p id="gradientInfo"></p>
+      <div id="info">
+        <p id="gradientInfo"></p>
+      </div>
     </div>
 
   </div>
@@ -202,14 +190,13 @@
           zaxis: { title: 'z', range: [0, 50] },
           camera: { eye: { x: -1.5, y: -1.5, z: 1.5 } }
         },
-        width: 700,
-        height: 600,
         margin: { l: 0, r: 0, b: 0, t: 0 },
         showlegend: true,
       };
 
       const config = {
-        displayModeBar: false  // Hide the Plotly mode bar
+        displayModeBar: false, // Hide the Plotly mode bar
+        responsive: true       // Make the plot responsive
       };
 
       Plotly.newPlot('plot', data, layout, config);
