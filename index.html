@@ -15,28 +15,28 @@
       width: 100%;
       height: 100%;
       box-sizing: border-box;
-      padding: 40px; /* Increased padding from 20px to 40px */
+      padding: 20px; /* Adjusted padding to make more space */
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #ffffff;
     }
 
     #plot-container {
       background-color: #ffffff;
-      padding: 20px;
+      padding: 10px;
       border-radius: 8px;
       box-sizing: border-box;
-      height: calc(100% - 100px); /* Adjusted to fit within container */
+      height: calc(100% - 80px); /* Adjusted to fit within container */
       width: 100%;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     #plot {
       width: 100%;
-      height: calc(100% - 80px); /* Adjust height to leave space for #info */
+      height: 75%; /* Adjusted height to leave space for #info */
     }
 
     #info {
-      margin-top: 20px;
+      margin-top: 10px;
       text-align: center;
     }
 
@@ -49,9 +49,17 @@
       font-weight: bold;
     }
 
+    /* Function caption styling */
+    #function-caption {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
     /* Adjust form styling */
     #inputForm {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     #inputForm label {
@@ -68,6 +76,8 @@
   </style>
   <!-- Include Plotly.js library -->
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <!-- Include MathJax for rendering LaTeX -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 </head>
 <body>
   <div id="container">
@@ -90,6 +100,9 @@
       <div id="plot"></div>
       <div id="info">
         <p id="gradientInfo"></p>
+        <div id="function-caption">
+          \( f(x, y) = x^2 + y^2 \)
+        </div>
       </div>
     </div>
 
@@ -205,6 +218,11 @@
       document.getElementById('gradientInfo').innerHTML =
         `<p>∇f = (<span>${gradX.toFixed(2)}</span>, <span>${gradY.toFixed(2)}</span>)</p>` +
         `<p>-∇f = (<span>${(-gradX).toFixed(2)}</span>, <span>${(-gradY).toFixed(2)}</span>)</p>`;
+
+      // Re-render MathJax (in case the function caption needs updating)
+      if (window.MathJax) {
+        MathJax.typesetPromise();
+      }
     }
 
     // Include numeric.js for linspace function
