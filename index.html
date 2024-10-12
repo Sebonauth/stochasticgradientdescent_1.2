@@ -4,49 +4,108 @@
   <meta charset="UTF-8">
   <title>Gradient Descent Visualizer</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      text-align: center;
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Prevent scrollbars */
+      height: 100%; /* Ensure the body takes full height */
     }
-    #graph {
-      margin: 0 auto;
-      width: 700px;
-      height: 600px;
+
+    #container {
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 40px; /* Increased padding from 20px to 40px */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #ffffff;
     }
-    form {
+
+    #plot-container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-sizing: border-box;
+      height: calc(100% - 80px); /* Adjusted based on increased container padding */
+      width: 60%;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      float: left; /* Position plot-container on the left */
+    }
+
+    #plot {
+      width: 100%;
+      height: calc(100% - 80px); /* Adjust height based on #info and padding */
+    }
+
+    #info {
+      margin-top: 20px;
+      float: left;
+      width: 35%; /* Adjust width to fit next to the plot */
+      margin-left: 5%;
+    }
+
+    #info p {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+
+    #info span {
+      font-weight: bold;
+    }
+
+    /* Adjust form styling */
+    #inputForm {
       margin-bottom: 20px;
     }
-    label {
+
+    #inputForm label {
       margin: 0 10px;
     }
-    input[type="number"] {
+
+    #inputForm input[type="number"] {
       width: 60px;
     }
-    button {
+
+    #inputForm button {
       margin-left: 10px;
+    }
+
+    /* Clear floats */
+    #container::after {
+      content: "";
+      clear: both;
+      display: table;
     }
   </style>
   <!-- Include Plotly.js library -->
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
+  <div id="container">
 
-  <form id="inputForm">
-    <label>
-      x:
-      <input type="number" id="xInput" value="1" step="0.1">
-    </label>
-    <label>
-      y:
-      <input type="number" id="yInput" value="1" step="0.1">
-    </label>
-    <button type="submit">Update Point</button>
-  </form>
+    <!-- Form -->
+    <form id="inputForm">
+      <label>
+        x:
+        <input type="number" id="xInput" value="1" step="0.1">
+      </label>
+      <label>
+        y:
+        <input type="number" id="yInput" value="1" step="0.1">
+      </label>
+      <button type="submit">Update Point</button>
+    </form>
 
-  <div id="graph"></div>
+    <!-- Plot Container -->
+    <div id="plot-container">
+      <div id="plot"></div>
+    </div>
 
-  <p id="gradientInfo"></p>
+    <!-- Info Section -->
+    <div id="info">
+      <p id="gradientInfo"></p>
+    </div>
+
+  </div>
 
   <script>
     // Function to compute the gradient
@@ -153,12 +212,12 @@
         displayModeBar: false  // Hide the Plotly mode bar
       };
 
-      Plotly.newPlot('graph', data, layout, config);
+      Plotly.newPlot('plot', data, layout, config);
 
       // Update gradient information
-      document.getElementById('gradientInfo').innerText =
-        `∇f = (${gradX.toFixed(2)}, ${gradY.toFixed(2)}),  ` +
-        `-∇f = (${(-gradX).toFixed(2)}, ${(-gradY).toFixed(2)})`;
+      document.getElementById('gradientInfo').innerHTML =
+        `<p>∇f = (<span>${gradX.toFixed(2)}</span>, <span>${gradY.toFixed(2)}</span>)</p>` +
+        `<p>-∇f = (<span>${(-gradX).toFixed(2)}</span>, <span>${(-gradY).toFixed(2)}</span>)</p>`;
     }
 
     // Include numeric.js for linspace function
@@ -186,6 +245,5 @@
       updateGraph(x, y);
     });
   </script>
-
 </body>
 </html>
