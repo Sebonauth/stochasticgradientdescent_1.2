@@ -1,254 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Gradient Descent Visualizer</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden; /* Prevent scrollbars */
-      height: 100%; /* Ensure the body takes full height */
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Descent Visualization</title>
+    <!-- Load Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Load MathJax for LaTeX rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-    #container {
-      width: 100%;
-      height: 100%;
-      box-sizing: border-box;
-      padding: 40px; /* Increased padding from 20px to 40px */
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #ffffff;
-    }
+    <style>
+        /* Overall page styling */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
 
-    #plot-container {
-      background-color: #ffffff;
-      padding: 20px;
-      border-radius: 8px;
-      box-sizing: border-box;
-      height: calc(100% - 100px); /* Adjusted to fit within container */
-      width: 100%;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 40px;
+        }
 
-    #plot {
-      width: 100%;
-      height: calc(100% - 130px); /* Adjust height to leave space for #info and function caption */
-    }
+        h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-    #info {
-      margin-top: 20px;
-      text-align: center;
-    }
+        p {
+            font-size: 1.2rem;
+            color: #34495e;
+            text-align: center;
+        }
 
-    #info p {
-      font-size: 18px;
-      margin: 5px 0;
-    }
+        .latex {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.3rem;
+        }
 
-    #info span {
-      font-weight: bold;
-    }
+        .slider-container {
+            margin: 30px 0;
+            text-align: center;
+        }
 
-    /* Function caption styling */
-    #function-caption {
-      margin-top: 10px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-    }
+        label {
+            font-size: 1.1rem;
+            color: #34495e;
+        }
 
-    /* Adjust form styling */
-    #inputForm {
-      margin-bottom: 20px;
-    }
+        #learningRateValue {
+            font-weight: bold;
+            color: #2980b9;
+        }
 
-    #inputForm label {
-      margin: 0 10px;
-    }
+        /* Style for the slider */
+        input[type="range"] {
+            width: 80%;
+            margin: 15px 0;
+            accent-color: #3498db;
+        }
 
-    #inputForm input[type="number"] {
-      width: 60px;
-    }
+        /* Responsive styling */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 10px;
+            }
 
-    #inputForm button {
-      margin-left: 10px;
-    }
-  </style>
-  <!-- Include Plotly.js library -->
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <!-- Include MathJax for rendering LaTeX -->
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="container">
+    <div class="container">
+        <h1>Gradient Descent Visualization</h1>
+        <p>Use the slider below to adjust the learning rate and observe how gradient descent progresses.</p>
 
-    <!-- Form -->
-    <form id="inputForm">
-      <label>
-        x:
-        <input type="number" id="xInput" value="1" step="0.1">
-      </label>
-      <label>
-        y:
-        <input type="number" id="yInput" value="1" step="0.1">
-      </label>
-      <button type="submit">Update Point</button>
-    </form>
-
-    <!-- Plot Container -->
-    <div id="plot-container">
-      <div id="plot"></div>
-      <div id="info">
-        <p id="gradientInfo"></p>
-        <div id="function-caption">
-          \( f(x, y) = x^2 + y^2 \)
+        <div class="latex">
+            <p>Function: \( f(x) = x^2 \)</p>
+            <p>Gradient: \( f'(x) = 2x \)</p>
+            <p>Update Rule: \( x_{\text{new}} = x - \alpha f'(x) \)</p>
         </div>
-      </div>
+
+        <!-- LaTeX title above the graph -->
+        <div class="latex">
+            <p>Gradient Descent on \( f(x) = x^2 \)</p>
+        </div>
+
+        <div class="slider-container">
+            <label for="learningRate">Learning Rate: <span id="learningRateValue">0.1</span></label>
+            <input type="range" id="learningRate" min="0.01" max="1" step="0.01" value="0.1" oninput="updateLearningRate(this.value)">
+        </div>
+
+        <div id="plot"></div>
     </div>
 
-  </div>
-
-  <script>
-    // Function to compute the gradient
-    function computeGradient(x, y) {
-      return { gradX: 2 * x, gradY: 2 * y };
-    }
-
-    // Function to update the graph
-    function updateGraph(x, y) {
-      const { gradX, gradY } = computeGradient(x, y);
-
-      // Generate data for the surface plot
-      const gridSize = 50;
-      const xRange = numeric.linspace(-5, 5, gridSize);
-      const yRange = numeric.linspace(-5, 5, gridSize);
-      const zData = [];
-      for (let i = 0; i < gridSize; i++) {
-        const row = [];
-        for (let j = 0; j < gridSize; j++) {
-          const xi = xRange[j];
-          const yi = yRange[i];
-          row.push(xi * xi + yi * yi);
+    <script>
+        // Gradient function
+        function gradient(x) {
+            return 2 * x; // Derivative of f(x) = x^2
         }
-        zData.push(row);
-      }
 
-      // Surface plot data
-      const surface = {
-        z: zData,
-        x: xRange,
-        y: yRange,
-        type: 'surface',
-        colorscale: 'Viridis',
-        opacity: 0.8,
-        showscale: false,
-        name: 'Surface'
-      };
+        // Function to plot and perform gradient descent
+        function plotGradientDescent(learningRate) {
+            let xValues = [];
+            let yValues = [];
+            let pathX = [];
+            let pathY = [];
 
-      // Point on the surface
-      const point = {
-        x: [x],
-        y: [y],
-        z: [x * x + y * y],
-        mode: 'markers',
-        type: 'scatter3d',
-        name: 'Point',
-        marker: { color: 'blue', size: 5 }
-      };
+            // Generate x values for the function
+            for (let i = -10; i <= 10; i += 0.1) {
+                xValues.push(i);
+                yValues.push(i * i);  // f(x) = x^2
+            }
 
-      // Gradient vector at the point
-      const gradMagnitude = Math.sqrt(gradX * gradX + gradY * gradY);
-      const gradUnitX = gradX / gradMagnitude;
-      const gradUnitY = gradY / gradMagnitude;
+            // Gradient Descent
+            let x = 10;  // Starting point
+            pathX.push(x);
+            pathY.push(x * x);
+            for (let i = 0; i < 100; i++) {
+                x = x - learningRate * gradient(x);
+                pathX.push(x);
+                pathY.push(x * x);
+                if (Math.abs(gradient(x)) < 0.001) break;  // Stop if gradient is close to 0
+            }
 
-      // Scale the gradient vector for visualization
-      const scale = 0.5;
-      const gradEndX = x + gradUnitX * scale;
-      const gradEndY = y + gradUnitY * scale;
-      const gradEndZ = (gradEndX * gradEndX) + (gradEndY * gradEndY);
+            // Plot the function and the path of gradient descent
+            const functionPlot = {
+                x: xValues,
+                y: yValues,
+                mode: 'lines',
+                line: { color: '#2980b9', width: 3 },
+                name: 'f(x) = x^2'
+            };
 
-      // Negative gradient vector
-      const negGradEndX = x - gradUnitX * scale;
-      const negGradEndY = y - gradUnitY * scale;
-      const negGradEndZ = (negGradEndX * negGradEndX) + (negGradEndY * negGradEndY);
+            const pathPlot = {
+                x: pathX,
+                y: pathY,
+                mode: 'markers+lines',
+                line: { color: '#e74c3c', width: 2, dash: 'dashdot' },
+                marker: { color: '#e74c3c', size: 8 },
+                name: 'Gradient Descent Path',
+            };
 
-      // Gradient vector data
-      const gradVector = {
-        x: [x, gradEndX],
-        y: [y, gradEndY],
-        z: [x * x + y * y, gradEndZ],
-        mode: 'lines',
-        type: 'scatter3d',
-        name: '∇f',
-        line: { color: 'red', width: 5 }
-      };
+            const layout = {
+                xaxis: { title: 'x', titlefont: { size: 18, color: '#34495e' }, fixedrange: true },
+                yaxis: { title: 'f(x)', titlefont: { size: 18, color: '#34495e' }, fixedrange: true },
+                plot_bgcolor: '#ecf0f1',
+                paper_bgcolor: '#ffffff',
+                showlegend: true,
+                legend: { x: 0.7, y: 1 },
+                margin: { l: 50, r: 30, b: 60, t: 30 }
+            };
 
-      // Negative gradient vector data
-      const negGradVector = {
-        x: [x, negGradEndX],
-        y: [y, negGradEndY],
-        z: [x * x + y * y, negGradEndZ],
-        mode: 'lines',
-        type: 'scatter3d',
-        name: '-∇f',
-        line: { color: 'green', width: 5 }
-      };
+            const config = {
+                displayModeBar: false  // Hide the Plotly toolbar
+            };
 
-      const data = [surface, point, gradVector, negGradVector];
+            Plotly.newPlot('plot', [functionPlot, pathPlot], layout, config);
+        }
 
-      const layout = {
-        scene: {
-          xaxis: { title: 'x', range: [-5, 5] },
-          yaxis: { title: 'y', range: [-5, 5] },
-          zaxis: { title: 'z', range: [0, 50] },
-          camera: { eye: { x: -1.5, y: -1.5, z: 1.5 } }
-        },
-        margin: { l: 0, r: 0, b: 0, t: 0 },
-        showlegend: true,
-      };
+        // Update learning rate and replot
+        function updateLearningRate(value) {
+            document.getElementById('learningRateValue').innerText = value;
+            plotGradientDescent(parseFloat(value));
+        }
 
-      const config = {
-        displayModeBar: false, // Hide the Plotly mode bar
-        responsive: true       // Make the plot responsive
-      };
-
-      Plotly.newPlot('plot', data, layout, config);
-
-      // Update gradient information
-      document.getElementById('gradientInfo').innerHTML =
-        `<p>∇f = (<span>${gradX.toFixed(2)}</span>, <span>${gradY.toFixed(2)}</span>)</p>` +
-        `<p>-∇f = (<span>${(-gradX).toFixed(2)}</span>, <span>${(-gradY).toFixed(2)}</span>)</p>`;
-
-      // Re-render MathJax (in case the function caption needs updating)
-      if (window.MathJax) {
-        MathJax.typesetPromise();
-      }
-    }
-
-    // Include numeric.js for linspace function
-    (function() {
-      // Numeric.js linspace function implementation
-      window.numeric = window.numeric || {};
-      window.numeric.linspace = function(a,b,n) {
-        n = n || Math.max(Math.round(b - a) + 1, 1);
-        if (n < 2) { return n === 1 ? [a] : []; }
-        var i, ret = Array(n);
-        n--;
-        for (i = n; i >= 0; i--) { ret[i] = (i * b + (n - i) * a) / n; }
-        return ret;
-      };
-    })();
-
-    // Initial plot
-    updateGraph(1, 1);
-
-    // Handle form submission
-    document.getElementById('inputForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const x = parseFloat(document.getElementById('xInput').value);
-      const y = parseFloat(document.getElementById('yInput').value);
-      updateGraph(x, y);
-    });
-  </script>
+        // Initial plot
+        window.onload = function() {
+            plotGradientDescent(0.1);
+            MathJax.typeset();  // Rerender LaTeX equations
+        };
+    </script>
 </body>
 </html>
