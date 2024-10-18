@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gradient Descent Visualization</title>
+    <title>Gradient Descent Visualization - 3D Surface</title>
     <!-- Load Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <!-- Load MathJax for LaTeX rendering -->
@@ -29,75 +29,6 @@
             text-align: center; /* Center content inside the container */
         }
 
-        p {
-            font-size: 1.2rem;
-            color: #34495e;
-            text-align: center;
-        }
-
-        .latex {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 1.3rem;
-        }
-
-        .slider-container {
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        label {
-            font-size: 1.1rem;
-            color: #34495e;
-        }
-
-        /* Fixed width for the learning rate display to prevent jumping */
-        #learningRateValue {
-            font-weight: bold;
-            color: #2980b9;
-            display: inline-block;
-            width: 40px; /* Fixed width to prevent jump */
-            text-align: right; /* Align the numbers to the right */
-        }
-
-        /* Style for the slider */
-        input[type="range"] {
-            -webkit-appearance: none; /* Remove default appearance */
-            appearance: none; /* Remove default appearance */
-            width: 80%;
-            height: 14px; /* Thicker slider */
-            background: linear-gradient(90deg, #3498db 0%, #e74c3c 100%);
-            border-radius: 5px;
-            outline: none;
-            transition: background 0.3s;
-            margin: 15px 0;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; /* Custom thumb */
-            appearance: none; /* Custom thumb */
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background-color: #fff;
-            border: 2px solid #3498db;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            background-color: #2980b9;
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background-color: #fff;
-            border: 2px solid #3498db;
-            cursor: pointer;
-        }
-
         /* Center the plot */
         #plot {
             display: block;
@@ -115,116 +46,74 @@
 </head>
 <body>
     <div class="container">
-        <!-- Removed the header -->
-        <p>Use the slider below to adjust the learning rate and observe how gradient descent progresses.</p>
-
-        <div class="latex">
-            <p>Function: \( f(x) = x^2 \)</p>
-            <p>Gradient: \( f'(x) = 2x \)</p>
-            <p>Update Rule: \( x_{\text{new}} = x - \alpha f'(x) \)</p>
-        </div>
-
-        <div class="slider-container">
-            <label for="learningRate">Learning Rate: <span id="learningRateValue">0.10</span></label>
-            <input type="range" id="learningRate" min="0.01" max="1" step="0.01" value="0.1" oninput="updateLearningRate(this.value)">
-        </div>
-
         <div id="plot"></div>
     </div>
 
     <script>
-        // Gradient function
-        function gradient(x) {
-            return 2 * x; // Derivative of f(x) = x^2
+        // Function f(x, y) = x^2 + y^2
+        function f(x, y) {
+            return x * x + y * y;
         }
 
-        // Function to plot and perform gradient descent
-        function plotGradientDescent(learningRate) {
-            let xValues = [];
-            let yValues = [];
-            let pathX = [];
-            let pathY = [];
+        // Generate data for surface plot
+        function generateSurfaceData() {
+            const xRange = [...Array(50).keys()].map(i => -5 + i * 0.2);  // X values from -5 to 5
+            const yRange = [...Array(50).keys()].map(i => -5 + i * 0.2);  // Y values from -5 to 5
 
-            // Generate x values for the function
-            for (let i = -10; i <= 10; i += 0.1) {
-                xValues.push(i);
-                yValues.push(i * i);  // f(x) = x^2
+            let zValues = [];
+            for (let i = 0; i < xRange.length; i++) {
+                let row = [];
+                for (let j = 0; j < yRange.length; j++) {
+                    row.push(f(xRange[i], yRange[j]));
+                }
+                zValues.push(row);
             }
 
-            // Gradient Descent
-            let x = 10;  // Starting point
-            pathX.push(x);
-            pathY.push(x * x);
-            for (let i = 0; i < 100; i++) {
-                x = x - learningRate * gradient(x);
-                pathX.push(x);
-                pathY.push(x * x);
-                if (Math.abs(gradient(x)) < 0.001) break;  // Stop if gradient is close to 0
-            }
+            return { x: xRange, y: yRange, z: zValues };
+        }
 
-            // Plot the function and the path of gradient descent
-            const functionPlot = {
-                x: xValues,
-                y: yValues,
-                mode: 'lines',
-                line: { color: '#2980b9', width: 5 },
-                name: 'f(x) = x^2',
-                hoverinfo: 'none'  // Disable hover info for this trace
-            };
+        // Function to plot the 3D surface
+        function plotSurface() {
+            const surfaceData = generateSurfaceData();
 
-            const pathPlot = {
-                x: pathX,
-                y: pathY,
-                mode: 'markers+lines',
-                line: { color: '#e74c3c', width: 5, dash: 'dashdot' },
-                marker: { color: '#e74c3c', size: 12 },
-                name: 'Gradient Descent Path',
-                hoverinfo: 'none'  // Disable hover info for this trace
+            const surfacePlot = {
+                x: surfaceData.x,
+                y: surfaceData.y,
+                z: surfaceData.z,
+                type: 'surface',
+                colorscale: 'Viridis',  // Color scale for the surface
+                showscale: false  // Hide the color bar scale
             };
 
             const layout = {
-                autosize: true, // Ensure the chart resizes to the iframe
-                xaxis: {
-                    title: 'x',
-                    titlefont: { size: 18, color: '#34495e' },
-                    linewidth: 2, // Thicker axis lines
-                    fixedrange: true
+                autosize: true,
+                scene: {
+                    xaxis: { title: 'x', linewidth: 2, showspikes: false, backgroundcolor: '#f2f1ef' },
+                    yaxis: { title: 'y', linewidth: 2, showspikes: false, backgroundcolor: '#f2f1ef' },
+                    zaxis: { title: 'f(x, y)', linewidth: 2, showspikes: false, backgroundcolor: '#f2f1ef' },
+                    aspectratio: { x: 1, y: 1, z: 0.7 }, // Adjust the 3D aspect ratio for better view
+                    camera: {
+                        eye: { x: 1.5, y: 1.5, z: 1.5 }  // Set the default camera angle
+                    },
+                    bgcolor: '#f2f1ef',  // Background color inside the 3D scene
                 },
-                yaxis: {
-                    title: 'f(x)',
-                    titlefont: { size: 18, color: '#34495e' },
-                    linewidth: 2, // Thicker axis lines
-                    fixedrange: true
-                },
-                plot_bgcolor: '#ecf0f1',
-                paper_bgcolor: '#f2f1ef', /* Light warm grey inside the plot as well */
-                showlegend: false, // Hide the legend
-                margin: { l: 70, r: 70, b: 70, t: 50 }, // Adjusted margins to avoid cutting
-                height: 500,  // Adjust height to fit iframe better
-                hovermode: false  // Disable hover mode globally
+                margin: { l: 0, r: 0, b: 0, t: 0 },
+                height: 600,  // Adjust height for a better fit
+                paper_bgcolor: '#f2f1ef',  // Light warm grey inside the container
+                plot_bgcolor: '#ecf0f1'
             };
 
             const config = {
                 displayModeBar: false  // Hide the Plotly toolbar
             };
 
-            Plotly.newPlot('plot', [functionPlot, pathPlot], layout, config);
+            Plotly.newPlot('plot', [surfacePlot], layout, config);
         }
 
-        // Update learning rate and replot
-        function updateLearningRate(value) {
-            // Fix precision to two decimal places to avoid jumps
-            const fixedValue = parseFloat(value).toFixed(2);
-            document.getElementById('learningRateValue').innerText = fixedValue;
-            plotGradientDescent(parseFloat(value));
-        }
-
-        // Ensure the plot renders fully centered on initial load
+        // Ensure the plot renders on page load
         window.onload = function() {
-            setTimeout(() => {
-                plotGradientDescent(0.1);
-                MathJax.typeset();  // Rerender LaTeX equations
-            }, 100);  // Add a slight delay to ensure container sizes are calculated correctly
+            plotSurface();
+            MathJax.typeset();  // Rerender LaTeX equations
         };
     </script>
 </body>
