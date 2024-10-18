@@ -27,13 +27,14 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             margin-top: 40px;
+            text-align: center; /* Center content inside the container */
         }
 
+        /* Heading styling */
         h1 {
             font-size: 2.5rem;
             color: #2c3e50;
             margin-bottom: 20px;
-            text-align: center;
         }
 
         p {
@@ -63,11 +64,47 @@
             color: #2980b9;
         }
 
-        /* Style for the slider */
+        /* Style for the slider without tooltips */
         input[type="range"] {
+            -webkit-appearance: none; /* Remove default appearance */
+            appearance: none; /* Remove default appearance */
             width: 80%;
+            height: 14px; /* Thicker slider */
+            background: linear-gradient(90deg, #3498db 0%, #e74c3c 100%);
+            border-radius: 5px;
+            outline: none;
+            transition: background 0.3s;
             margin: 15px 0;
-            accent-color: #3498db;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; /* Custom thumb */
+            appearance: none; /* Custom thumb */
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 2px solid #3498db;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background-color: #2980b9;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 2px solid #3498db;
+            cursor: pointer;
+        }
+
+        /* Center the plot */
+        #plot {
+            display: inline-block;
         }
 
         /* Responsive styling */
@@ -75,27 +112,20 @@
             .container {
                 padding: 20px 10px;
             }
-
-            h1 {
-                font-size: 2rem;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Gradient Descent Visualization</h1>
+        <!-- Proper Heading with LaTeX -->
+        <h1>Gradient Descent on \( f(x) = x^2 \)</h1>
+
         <p>Use the slider below to adjust the learning rate and observe how gradient descent progresses.</p>
 
         <div class="latex">
             <p>Function: \( f(x) = x^2 \)</p>
             <p>Gradient: \( f'(x) = 2x \)</p>
             <p>Update Rule: \( x_{\text{new}} = x - \alpha f'(x) \)</p>
-        </div>
-
-        <!-- LaTeX title above the graph -->
-        <div class="latex">
-            <p>Gradient Descent on \( f(x) = x^2 \)</p>
         </div>
 
         <div class="slider-container">
@@ -141,7 +171,7 @@
                 x: xValues,
                 y: yValues,
                 mode: 'lines',
-                line: { color: '#2980b9', width: 3 },
+                line: { color: '#2980b9', width: 5 }, // Increased line width
                 name: 'f(x) = x^2'
             };
 
@@ -149,19 +179,31 @@
                 x: pathX,
                 y: pathY,
                 mode: 'markers+lines',
-                line: { color: '#e74c3c', width: 2, dash: 'dashdot' },
-                marker: { color: '#e74c3c', size: 8 },
+                line: { color: '#e74c3c', width: 5, dash: 'dashdot' }, // Increased line width
+                marker: { color: '#e74c3c', size: 12 }, // Increased point size
                 name: 'Gradient Descent Path',
             };
 
             const layout = {
-                xaxis: { title: 'x', titlefont: { size: 18, color: '#34495e' }, fixedrange: true },
-                yaxis: { title: 'f(x)', titlefont: { size: 18, color: '#34495e' }, fixedrange: true },
+                xaxis: {
+                    title: 'x',
+                    titlefont: { size: 18, color: '#34495e' },
+                    linewidth: 2, // Thicker axis lines
+                    fixedrange: true
+                },
+                yaxis: {
+                    title: 'f(x)',
+                    titlefont: { size: 18, color: '#34495e' },
+                    linewidth: 2, // Thicker axis lines
+                    fixedrange: true
+                },
                 plot_bgcolor: '#ecf0f1',
                 paper_bgcolor: '#f2f1ef', /* Light warm grey inside the plot as well */
                 showlegend: true,
-                legend: { x: 0.7, y: 1 },
-                margin: { l: 50, r: 30, b: 60, t: 30 }
+                legend: { x: 0.05, y: 1 }, // Legend closer to y-axis
+                margin: { l: 50, r: 30, b: 60, t: 30 },
+                width: 800,  // Set width to help center the plot
+                height: 500  // Set height for consistent sizing
             };
 
             const config = {
