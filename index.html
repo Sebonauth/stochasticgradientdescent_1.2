@@ -64,7 +64,7 @@
             color: #2980b9;
         }
 
-        /* Style for the slider without tooltips */
+        /* Style for the slider */
         input[type="range"] {
             -webkit-appearance: none; /* Remove default appearance */
             appearance: none; /* Remove default appearance */
@@ -105,6 +105,7 @@
         /* Center the plot */
         #plot {
             display: inline-block;
+            width: 100%; /* Make sure the plot takes full width */
         }
 
         /* Responsive styling */
@@ -171,20 +172,23 @@
                 x: xValues,
                 y: yValues,
                 mode: 'lines',
-                line: { color: '#2980b9', width: 5 }, // Increased line width
-                name: 'f(x) = x^2'
+                line: { color: '#2980b9', width: 5 },
+                name: 'f(x) = x^2',
+                hoverinfo: 'none'  // Disable hover info for this trace
             };
 
             const pathPlot = {
                 x: pathX,
                 y: pathY,
                 mode: 'markers+lines',
-                line: { color: '#e74c3c', width: 5, dash: 'dashdot' }, // Increased line width
-                marker: { color: '#e74c3c', size: 12 }, // Increased point size
+                line: { color: '#e74c3c', width: 5, dash: 'dashdot' },
+                marker: { color: '#e74c3c', size: 12 },
                 name: 'Gradient Descent Path',
+                hoverinfo: 'none'  // Disable hover info for this trace
             };
 
             const layout = {
+                autosize: true, // Ensure the chart resizes to the iframe
                 xaxis: {
                     title: 'x',
                     titlefont: { size: 18, color: '#34495e' },
@@ -200,10 +204,10 @@
                 plot_bgcolor: '#ecf0f1',
                 paper_bgcolor: '#f2f1ef', /* Light warm grey inside the plot as well */
                 showlegend: true,
-                legend: { x: 0.05, y: 1 }, // Legend closer to y-axis
-                margin: { l: 50, r: 30, b: 60, t: 30 },
-                width: 800,  // Set width to help center the plot
-                height: 500  // Set height for consistent sizing
+                legend: { x: 0.05, y: 1 },
+                margin: { l: 70, r: 30, b: 70, t: 50 },
+                height: 500,  // Adjust height to fit iframe better
+                hovermode: false  // Disable hover mode globally
             };
 
             const config = {
