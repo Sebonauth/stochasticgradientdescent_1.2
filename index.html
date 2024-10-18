@@ -104,8 +104,9 @@
 
         /* Center the plot */
         #plot {
-            display: inline-block;
-            width: 100%; /* Make sure the plot takes full width */
+            display: block;
+            margin: 0 auto;
+            width: 100%;
         }
 
         /* Responsive styling */
@@ -204,8 +205,8 @@
                 plot_bgcolor: '#ecf0f1',
                 paper_bgcolor: '#f2f1ef', /* Light warm grey inside the plot as well */
                 showlegend: true,
-                legend: { x: 0.05, y: 1 },
-                margin: { l: 70, r: 30, b: 70, t: 50 },
+                legend: { x: 0.1, y: 1 }, // Legend moved closer to the center
+                margin: { l: 70, r: 70, b: 70, t: 50 }, // Adjusted margins to avoid cutting
                 height: 500,  // Adjust height to fit iframe better
                 hovermode: false  // Disable hover mode globally
             };
