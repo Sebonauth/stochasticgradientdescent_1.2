@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gradient Descent Visualization - 3D Surface</title>
     <!-- Load Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -88,23 +87,23 @@
             const layout = {
                 autosize: true,
                 scene: {
-                    xaxis: { title: 'x', linewidth: 2, showspikes: false, backgroundcolor: '#f2f1ef' },
-                    yaxis: { title: 'y', linewidth: 2, showspikes: false, backgroundcolor: '#f2f1ef' },
-                    zaxis: { title: 'f(x, y)', linewidth: 2, showspikes: false, backgroundcolor: '#f2f1ef' },
-                    aspectratio: { x: 1, y: 1, z: 0.7 }, // Adjust the 3D aspect ratio for better view
-                    camera: {
-                        eye: { x: 1.5, y: 1.5, z: 1.5 }  // Set the default camera angle
-                    },
-                    bgcolor: '#f2f1ef',  // Background color inside the 3D scene
+                    xaxis: { title: 'x', titlefont: { color: '#34495e' }, backgroundcolor: '#ecf0f1' },
+                    yaxis: { title: 'y', titlefont: { color: '#34495e' }, backgroundcolor: '#ecf0f1' },
+                    zaxis: { title: 'f(x, y)', titlefont: { color: '#34495e' }, backgroundcolor: '#ecf0f1' },
+                    aspectmode: 'cube', // Keep the axes equally scaled
+                    dragmode: 'orbit',  // Enable only rotation
                 },
-                margin: { l: 0, r: 0, b: 0, t: 0 },
-                height: 600,  // Adjust height for a better fit
-                paper_bgcolor: '#f2f1ef',  // Light warm grey inside the container
-                plot_bgcolor: '#ecf0f1'
+                plot_bgcolor: '#ecf0f1',
+                paper_bgcolor: '#f2f1ef',
+                margin: { l: 50, r: 50, b: 50, t: 50 },
+                height: 600
             };
 
             const config = {
-                displayModeBar: false  // Hide the Plotly toolbar
+                displayModeBar: false,  // Hide the Plotly toolbar
+                scrollZoom: false,  // Disable zooming with scroll
+                responsive: true,    // Ensure responsiveness
+                staticPlot: false,    // Allow rotation
             };
 
             Plotly.newPlot('plot', [surfacePlot], layout, config);
